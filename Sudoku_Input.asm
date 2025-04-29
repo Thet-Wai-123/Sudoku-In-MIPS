@@ -19,28 +19,28 @@ prompt_val: .asciiz "Enter value(1–9, 0 to clear): "
     .globl getInput
 getInput:
     # reads the row 
-    li   $v0, 4            # prints prompt_row
+    li   $v0, 4       # prints prompt_row
     la   $a0, prompt_row
     syscall
-    getInt $a0             # read into $a0
-    move $v0, $a0          # return the row to $v0
+    getInt $a0       # read into $a0
+    move $v0, $a0       # return the row to $v0
 
     # optional: range check 0–9, otherwise reprompt if invalid
     # reads the collumn
     li   $v0, 4
     la   $a0, prompt_col
     syscall
-    getInt $a0             # read into $a0
-    move $v1, $a0          # returns thr col to $v1
+    getInt $a0       # read into $a0
+    move $v1, $a0       # returns thr col to $v1
 
     # reads the value
     li   $v0, 4
     la   $a0, prompt_val
     syscall
-    getInt $a0             # read into $a0
-    move $v2, $a0          # return the val function to $v2
+    getInt $a0       # read into $a0
+    move $v2, $a0       # return the val function to $v2
 
-    jr   $ra               # sends back to the caller
+    jr   $ra       # sends back to the caller
 
 
 
