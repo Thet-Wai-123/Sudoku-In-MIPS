@@ -47,7 +47,7 @@ getInput:
 main:
     jal getInput
     #you can use $v0 (row), $v1 (col), $v2 (val)
-    # e.g., check for exit:
+    #such as checking for exit:
     beq $v0, $zero, exit
 #More logic can go here if anythimg
 
