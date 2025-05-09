@@ -159,3 +159,33 @@ _checkColumnDup_exit:
 	move $a0, %int
 	syscall
 .end_macro
+
+.macro checkRows
+	li $s1, 0
+loopRows:
+	# stop loop after all rows
+	bgt $s1, 8, _loopRows_stop
+	checkRow($s1)
+	
+	# stop loop with outputs already in $v0 & $v1 if duplicate exists
+	beq $v0, 1, _loopRows_stop
+	
+	addi $s1, $s1, 1
+_loopRows_stop:
+.end_macro
+
+.macro checkColumns
+	li $s1, 0
+loopColumns:
+	# stop loop after all rows
+	bgt $s1, 8, _loopColumns_stop
+	checkColumn($s1)
+	
+	# stop loop with outputs already in $v0 & $v1 if duplicate exists
+	beq $v0, 1, _loopColumns_stop
+	
+	addi $s1, $s1, 1
+_loopColumns_stop:
+.end_macro
+
+	
