@@ -79,6 +79,8 @@ _checkRowDup_found:
 	# load results
 	li $v0, 1
 	move $v1, $t9
+	
+	j _checkRowDup_exit
 
 _checkRowDup_end:
 	li $v0, 0
@@ -145,6 +147,9 @@ _checkColumnDup_exit:
 	checkRowDuplicates()
 .end_macro
 
+# Macro to check column for duplicates
+# %column = column index
+# $v0 = 0 if no duplicates, 1 if duplicate exists
 .macro checkColumn(%column)
 	# Setup
 	la $t3, track
@@ -187,5 +192,40 @@ loopColumns:
 	addi $s1, $s1, 1
 _loopColumns_stop:
 .end_macro
+
+# macro to check if entire board is filled
+# since check for duplicate numbers is part of input validation, this only checks all spaces in the board are filled
+# we assume board address is at $s0
+# output: $v0 is 0 to indicate win, 1 to indicate board is still incomplete
+.macro checkWin
+	# initialize counter at $t0
+	li $t0, 0
+loop:
+	# check if entire board has been traversed
+	bge $t0, 81, _checkWin_complete
+	
+	# calculate memory address of current index
+	mul $t1, $t0, 4
+	add $t1, $t1, $s0
+	
+	# load cell number into $t1
+	lw $t1, 0($t1)
+	
+	# jump to incomplete if cell number is 0 (value has not been filled)
+	beq $t1, 0, _checkWin_incomplete
+	
+	# increment counter and begin next iteration
+	addi $t0, $t0, 1
+	j loop
+_checkWin_complete:
+	li $v0, 0
+	j _checkWin_exit
+_checkWin_incomplete:
+	li $v0, 1
+	j _checkWin_exit
+_checkWin_exit:
+.end_macro
+
+	
 
 	
