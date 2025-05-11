@@ -1,6 +1,6 @@
 .data
 	#board: .space 324
-	border_row: .asciiz "---+---+---+\n"
+	border_row: .asciiz "+-------+-------+-------+\n"
 	border_col: .asciiz "|"
 	#space: .asciiz "0" 
 
