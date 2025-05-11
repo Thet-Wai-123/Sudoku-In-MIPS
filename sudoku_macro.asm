@@ -1,4 +1,5 @@
 .data
+	.align 2  
 	track: .space 40  # 10 * 4 bytes (index 0 unused)
 	newline: .asciiz "\n"
 	found: .asciiz "duplicate found"
@@ -23,7 +24,8 @@
 	lw $v0, 0($t0)
 .end_macro
 
-.macro set_value(%row, %column, %value)
+# $v0 : 0=success, 1=rowError, 2=columnError, 3=3x3Error
+.macro set_value_if_valid(%row, %column, %value)
 	# Base address of board
 	move $t0, $s0
 
@@ -37,8 +39,44 @@
 	# Address of desired cell
 	add $t0, $t0, $t1
 
-	# Store the value in the cell
+	# Store the previous value and address that was in this spot into memory in $sp
+	lw $t1, 0($t0)
+	move $s1, $t0
+	
+	addi $sp, $sp, -4
+	sw $t1, 0($sp)
+	
+	# Write the value here
 	sw %value, 0($t0)
+
+	# Checking if valid, if not reverting back
+	checkRow(%row)
+	beq $v0, 1, invalidRow
+	checkColumn(%column)
+	beq $v0, 1, invalidColumn
+	
+	addi $sp, $sp, 4
+	j endOfMacro
+	
+invalidRow:
+	lw $t1, 0($sp)
+	addi $sp, $sp, 4
+	li $v0, 1
+	j revertBackValue
+invalidColumn:
+	lw $t1, 0($sp)
+	addi $sp, $sp, 4
+	li $v0, 2
+	j revertBackValue
+invalidNeighbor:
+	lw $t1, 0($sp)
+	addi $sp, $sp, 4
+	li $v0, 3
+	j revertBackValue
+revertBackValue:
+	#we set the t1 using the stack pointer, and s1 is the value used to store the address at the top
+	sw $t1, 0($s1)
+endOfMacro:
 .end_macro
 
 

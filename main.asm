@@ -1,9 +1,4 @@
-.text
-	j main #jump immediately to main to avoid running .text in included files
-
 .include "sudoku_macro.asm"
-.include "printBoard.asm"
-.include "Sudoku_Input.asm"
 
 .data
 emptyBoard: .word 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
@@ -35,30 +30,15 @@ gameLoop:
 	subi $s2, $s2, 1
 	subi $s3, $s3, 1
 	
-	#check if conditions are met
-	#t8 is the index, and t2 is the value
-	
-	printString(newline)
-	
-	# check for row duplicates with checkRows macro, branch to error message if $v0 = 1
-	checkRows
-	beq $v0, 1, brokeRow
-	
-	# check for column duplicates with checkColumns macro, branch to error message if $v0 = 1
-	checkColumns
-	beq $v0, 1, brokeColumn
-	
 	#set the value in the array
-	set_value($s2, $s3, $s4)
+	set_value_if_valid($s2, $s3, $s4)
+	
+	beq $v0, 1, brokeRow
+	beq $v0, 2, brokeColumn
 	
 	#next turn
 	j gameLoop
 
-	
-	#checking sudoku rulesets for column
-	move $t8, $s3
-	move $t9, $s4
-	checkColumnDuplicates
 	
 brokeRow:
 	printString(brokeRowMessage)
