@@ -1,10 +1,8 @@
-.include "sudoku_macro.asm"
-
 .data
-	board: .space 324
+	#board: .space 324
 	border_row: .asciiz "---+---+---+\n"
 	border_col: .asciiz "|"
-	space: .asciiz "0" 
+	#space: .asciiz "0" 
 
 
 .eqv printLoopCounter $s5

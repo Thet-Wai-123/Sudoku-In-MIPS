@@ -1,6 +1,7 @@
 .data
 	track: .space 40  # 10 * 4 bytes (index 0 unused)
 	newline: .asciiz "\n"
+	found: .asciiz "duplicate found"
 .text
 
 # addr = baseAddr + (row * 9 + column) * 4

@@ -1,4 +1,9 @@
+.text
+	j main #jump immediately to main to avoid running .text in included files
+
 .include "sudoku_macro.asm"
+.include "printBoard.asm"
+.include "Sudoku_Input.asm"
 
 .data
 emptyBoard: .word 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
@@ -7,7 +12,9 @@ space: .asciiz " "
 newLine: .asciiz "\n"
 colLength: .word 9
 rowLength: .word 9
-breakRuleMsg: .asciiz "You broke a rule (might wanna specify): \n"
+brokeRowMessage: .asciiz "Invalid move. That number is already in the row. \n\n"
+brokeColumnMessage: .asciiz "Invalid move. That number is already in the column. \n\n"
+check: .asciiz "we just checked rows"
 
 
 
@@ -30,16 +37,16 @@ gameLoop:
 	
 	#check if conditions are met
 	#t8 is the index, and t2 is the value
-	move $t8, $s2
-	move $t2, $s4
-	checkRowDuplicates
-	bgt $v0, 0, breakRule
 	
+	printString(newline)
 	
-	move $t8, $s3
-	move $t2, $s4
-	checkRowDuplicates
-	bgt $v0, 0, breakRule
+	# check for row duplicates with checkRows macro, branch to error message if $v0 = 1
+	checkRows
+	beq $v0, 1, brokeRow
+	
+	# check for column duplicates with checkColumns macro, branch to error message if $v0 = 1
+	checkColumns
+	beq $v0, 1, brokeColumn
 	
 	#set the value in the array
 	set_value($s2, $s3, $s4)
@@ -53,8 +60,12 @@ gameLoop:
 	move $t9, $s4
 	checkColumnDuplicates
 	
-breakRule:
-	printString(breakRuleMsg)
+brokeRow:
+	printString(brokeRowMessage)
+	j gameLoop
+	
+brokeColumn:
+	printString(brokeColumnMessage)
 	j gameLoop
 	
 	
