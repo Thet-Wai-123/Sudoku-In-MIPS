@@ -18,12 +18,13 @@ newLine: .asciiz "\n"
 colLength: .word 9
 rowLength: .word 9
 
+
 .text
-main:
-    la $s0, board
-    lw $t0, colLength     # number of rows
-    lw $t1, rowLength     # number of columns (save original value too)
-    move $t3, $t1         # $t3 will store the original rowLength to reset later
+#main:
+ #   la $s0, board
+  #  lw $t0, colLength     # number of rows
+   # lw $t1, rowLength     # number of columns (save original value too)
+    #move $t3, $t1         # $t3 will store the original rowLength to reset later
 
 printLoop:
     beqz $t0, exit        # If no more rows, exit

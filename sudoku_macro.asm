@@ -1,6 +1,6 @@
 .data
 	track: .space 40  # 10 * 4 bytes (index 0 unused)
-
+	newline: .asciiz "\n"
 .text
 
 # addr = baseAddr + (row * 9 + column) * 4
@@ -21,6 +21,25 @@
 	# Load word into $v0
 	lw $v0, 0($t0)
 .end_macro
+
+.macro set_value(%row, %column, %value)
+	# Base address of board
+	move $t0, $s0
+
+	# Correct index = row * 9 + column
+	mul $t1, %row, 9
+	add $t1, $t1, %column
+
+	# Multiply by size of word (4 bytes)
+	mul $t1, $t1, 4
+
+	# Address of desired cell
+	add $t0, $t0, $t1
+
+	# Store the value in the cell
+	sw %value, 0($t0)
+.end_macro
+
 
 # Macro to clear the track array
 .macro clearLoop()
@@ -224,6 +243,20 @@ _checkWin_incomplete:
 	li $v0, 1
 	j _checkWin_exit
 _checkWin_exit:
+.end_macro
+
+#Added by Thet- my macros I used in another file
+ 
+.macro printString(%string)
+    li $v0, 4
+    la $a0, %string
+    syscall
+.end_macro
+
+.macro goToNewLine
+    li $v0, 4
+    la $a0, newline
+    syscall
 .end_macro
 
 	
