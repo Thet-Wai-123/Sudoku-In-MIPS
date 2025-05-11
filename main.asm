@@ -23,9 +23,14 @@ gameLoop:
 	#get the user inputs
 	jal getInput #row in s2, and then column in s3, and value in s4
 	
+	#subtract s2 and s3 by 1 to match the index 0 start in the internal implementations
+	subi $s2, $s2, 1
+	subi $s3, $s3, 1
+	
 	#check if conditions are met
 	
 	#set the value in the array
+	
 	set_value($s2, $s3, $s4)
 	
 	#next turn
@@ -36,9 +41,4 @@ gameLoop:
 	move $t8, $s3
 	move $t9, $s4
 	checkColumnDuplicates
-	
-	#checking if the output v0, is valid or not, 0 = valid, 1 = not valid
-	
-	
-	#assuming that printBoard is a function
 	
