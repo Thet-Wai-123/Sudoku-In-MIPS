@@ -7,6 +7,7 @@ space: .asciiz " "
 newLine: .asciiz "\n"
 colLength: .word 9
 rowLength: .word 9
+breakRuleMsg: .asciiz "You broke a rule (might wanna specify): \n"
 
 
 
@@ -28,9 +29,19 @@ gameLoop:
 	subi $s3, $s3, 1
 	
 	#check if conditions are met
+	#t8 is the index, and t2 is the value
+	move $t8, $s2
+	move $t2, $s4
+	checkRowDuplicates
+	bgt $v0, 0, breakRule
+	
+	
+	move $t8, $s3
+	move $t2, $s4
+	checkRowDuplicates
+	bgt $v0, 0, breakRule
 	
 	#set the value in the array
-	
 	set_value($s2, $s3, $s4)
 	
 	#next turn
@@ -41,4 +52,13 @@ gameLoop:
 	move $t8, $s3
 	move $t9, $s4
 	checkColumnDuplicates
+	
+breakRule:
+	printString(breakRuleMsg)
+	j gameLoop
+	
+	
+
+
+
 	
