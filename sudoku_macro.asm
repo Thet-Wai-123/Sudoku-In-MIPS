@@ -359,8 +359,6 @@ _checkWin_incomplete:
 	j _checkWin_exit
 _checkWin_exit:
 .end_macro
-
-#Added by Thet- my macros I used in another file
  
 .macro printString(%string)
     li $v0, 4
@@ -374,6 +372,24 @@ _checkWin_exit:
     syscall
 .end_macro
 
+#returns 1 if the cell is mutable, and 0 if not into v0
+.macro checkIfCellIsMutable(%row, %column, %allowChange)
+	# Base address of board
+	la $t0 %allowChange
+	
+	# Correct index = row * 9 + column
+	mul $t1, %row, 9
+	add $t1, $t1, %column
+
+	# Multiply by size of word (4 bytes)
+	mul $t1, $t1, 4
+
+	# Address of desired cell
+	add $t0, $t0, $t1
+
+	# Load word into $v0
+	lw $v0, 0($t0)
+.end_macro
 	
 
 	
