@@ -12,6 +12,7 @@ colLength: .word 9
 rowLength: .word 9
 brokeRowMessage: .asciiz "Invalid move. That number is already in the row. \n\n"
 brokeColumnMessage: .asciiz "Invalid move. That number is already in the column. \n\n"
+brokeBoxMessage: .asciiz "Invalid move. That number is already in the 3x3 box.\n\n"
 check: .asciiz "we just checked rows"
 winMessage: .asciiz "You win, and completed the sudoku board!!!"
 
@@ -39,6 +40,7 @@ gameLoop:
 	
 	beq $v0, 1, brokeRow
 	beq $v0, 2, brokeColumn
+	beq $v0, 3, brokeBox
 	
 	checkWin
 	beq $v0, 0, gameOver
@@ -55,6 +57,11 @@ brokeColumn:
 	printString(brokeColumnMessage)
 	j gameLoop
 	
+brokeBox:
+	printString(brokeBoxMessage)
+	j gameLoop
+
+
 gameOver:
 	printString(winMessage)
 	li $v0, 10

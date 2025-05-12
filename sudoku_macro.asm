@@ -54,6 +54,9 @@
 	beq $v0, 1, invalidRow
 	checkColumn(%column)
 	beq $v0, 1, invalidColumn
+	checkBox(%row, %column)
+	beq $v0, 1, invalidNeighbor
+
 	
 	addi $sp, $sp, 4
 	j endOfMacro
@@ -250,6 +253,79 @@ loopColumns:
 	addi $s1, $s1, 1
 _loopColumns_stop:
 .end_macro
+
+
+# Macro to check duplicates in a 3x3 box
+# Assumes $t8 = row index, $t9 = col index
+# Returns $v0 = 0 if no duplicates, 1 if duplicate found
+.macro checkBoxDuplicates()
+    # clear tracker
+    la $t3, track
+    clearLoop()
+
+    # Compute box start row and column (top-left of 3x3 box)
+    div $t0, $t8, 3       # $t0 = box start row index
+    mflo $t0
+    mul $t0, $t0, 3       # actual row index of box start
+
+    div $t1, $t9, 3       # $t1 = box start col index
+    mflo $t1
+    mul $t1, $t1, 3       # actual col index of box start
+
+    li $t2, 0             # box row offset
+_box_row_loop:
+    li $t4, 0             # box col offset
+_box_col_loop:
+    # Compute actual row and col: a0 = row, a1 = col
+    add $a0, $t0, $t2
+    add $a1, $t1, $t4
+
+    # Inline get_value(a0, a1)
+    mul $t5, $a0, 9       # offset = row * 9
+    add $t5, $t5, $a1     # offset += col
+    mul $t5, $t5, 4       # offset *= 4
+    add $t6, $s0, $t5     # address = base + offset
+    lw $t7, 0($t6)        # value = board[row][col]
+
+    # skip if value is 0 (empty cell)
+    beqz $t7, _next_box_cell
+
+    # check for duplicates using track array
+    subi $t7, $t7, 1      # convert to 0-based index
+    mul $t5, $t7, 4
+    la $t6, track
+    add $t5, $t5, $t6
+    lw $t6, 0($t5)
+    beq $t6, 1, _found_box_dup
+    li $t6, 1
+    sw $t6, 0($t5)
+
+_next_box_cell:
+    addi $t4, $t4, 1
+    blt $t4, 3, _box_col_loop
+
+    addi $t2, $t2, 1
+    blt $t2, 3, _box_row_loop
+
+    li $v0, 0
+    j _exit_box_check
+
+_found_box_dup:
+    li $v0, 1
+_exit_box_check:
+.end_macro
+
+
+
+# Macro to check 3x3 box for duplicates
+# %row = row index, %col = col index
+# $v0 = 0 if no duplicates, 1 if duplicate exists
+.macro checkBox(%row, %col)
+    move $t8, %row
+    move $t9, %col
+    checkBoxDuplicates()
+.end_macro
+
 
 # macro to check if entire board is filled
 # since check for duplicate numbers is part of input validation, this only checks all spaces in the board are filled
